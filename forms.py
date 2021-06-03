@@ -62,6 +62,18 @@ class UpdateAccountForm(FlaskForm):
         if not bcrypt.check_password_hash(current_user.password, password.data):
             raise ValidationError('Wrong password.')
 
+
+class ChangePasswordForm(FlaskForm):
+    password = PasswordField('Old password', validators=[DataRequired()])
+    new_password = PasswordField('New password', validators=[DataRequired(), Length(min=6, max=30)])
+    confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Change')
+  
+    def validate_password(self, password):
+        if not bcrypt.check_password_hash(current_user.password, password.data):
+            raise ValidationError('Wrong password.')
+
+
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     content = TextAreaField('Content', validators=[DataRequired()])

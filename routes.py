@@ -3,7 +3,7 @@ import secrets
 from flask import render_template, url_for, flash, redirect, request
 from wtforms.validators import ValidationError
 from app import app, db, bcrypt
-from forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm, CommentForm
+from forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm, CommentForm, ChangePasswordForm
 from models import User, Post, Comment
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -69,18 +69,27 @@ def account():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
-            current_user.username = form.username.data
-            current_user.email = form.email.data
-            db.session.commit()
-            flash('Update successfully!', 'success')
-            return redirect(url_for('account'))
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Update successfully!', 'success')
+        return redirect(url_for('account'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
-        form.password.data = current_user.password
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
+
+@app.route("/change_password", methods=['GET', 'POST',])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        current_user.password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        db.session.commit()
+        flash('Password has been changed!', 'success')
+    return render_template('change_password.html',form=form)
 
 @app.route("/post/new", methods=['GET', 'POST'])
 @login_required
