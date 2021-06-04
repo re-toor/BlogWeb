@@ -22,7 +22,7 @@
       
       <section class="add-comment">
         <h3>Leave a comment</h3>
-        <form action="{{ url_for('update_post', post_id=post.id) }}" method="POST">
+        <form action="{{ url_for('post', post_id=post.id) }}" method="POST">
           <label>Comment:</label></br>
           <textarea required class="form-control" rows="6" name="comment"></textarea></br>
           <label>Name:</label></br>
