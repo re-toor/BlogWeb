@@ -9,7 +9,8 @@
               <a class="mr-2" href="{{ url_for('account') }}">{{ post.author.username }}</a>
               <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
             </div>
-            <h2><a class="article-title" href="{{ url_for('post', post_id=post.id) }}"><i>{{ post.title }}</i></a></h2>
+            <h2><a class="article-title"><i>{{ post.title }}</i></a></h2>
+            <a class="btn btn-primary btn-sm mt-1 mb-1" href="{{ url_for('post', post_id=post.id) }}">View post</a> 
           </div>
         </article>
     {% endfor %}
