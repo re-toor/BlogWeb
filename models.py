@@ -29,6 +29,7 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(150), nullable=False, default='no-image.jpg')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     comment = db.relationship('Comment', backref='artical', lazy=True)
 
@@ -40,12 +41,15 @@ class Comment(db.Model):
     __tablename__ = 'comment'
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    body = db.Column(db.Text, nullable=False)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
 
+
     def __repr__(self):
-        return f"Comment('{self.body}', '{self.timestamp}')"
+        return f"Comment('{self.message}', '{self.timestamp}')"
 
 if __name__ == '__main__':
     db.create_all()

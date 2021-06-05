@@ -1,7 +1,6 @@
 import os
 import secrets
 from flask import render_template, url_for, flash, redirect, request
-from wtforms.validators import ValidationError
 from app import app, db, bcrypt
 from forms import SignUpForm, LoginForm, UpdateAccountForm, PostForm, CommentForm, ChangePasswordForm
 from models import User, Post, Comment
@@ -96,7 +95,7 @@ def change_password():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        post = Post(title=form.title.data, content=form.content.data,image=form.photo.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -104,10 +103,21 @@ def new_post():
     return render_template('create_post.html', title='New Post',
                            form=form, legend='New Post')
 
-@app.route("/post/<int:post_id>")
+@app.route("/post/<int:post_id>", methods=['GET', 'POST',])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(name=form.username.data, email=form.email.data, message=form.message.data, article=post.id)
+        db.session.add(comment)
+        db.session.commit()
+        flash('Successfully!', 'success')
+        return redirect(url_for('post', post_id=post.id))
+    elif request.method == 'GET':
+        form.username.data = post.username
+        form.email.data = post.email
+        form.message.data = post.message
+    return render_template('post.html', title=post.title, form=form, post=post)
 
 @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
 @login_required
@@ -139,18 +149,4 @@ def delete_post(post_id):
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('home'))
 
-
-@app.route("/post/<int:post_id>/comment", methods=['GET', 'POST'])
-@login_required
-def comment_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    form = CommentForm()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            comment = Comment(body = form.body.data, article=post.id)
-            db.session.add(comment)
-            db.session.commit()
-            flash("Comment has been added to the post.", "success")
-            return redirect(url_for('post', post_id=post.id))
-    return render_template('post.html', title='Comment Post', form=form, post_id=post_id)
 

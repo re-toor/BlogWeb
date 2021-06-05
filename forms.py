@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from models import User
 from app import bcrypt
@@ -77,9 +77,23 @@ class ChangePasswordForm(FlaskForm):
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     content = TextAreaField('Content', validators=[DataRequired()])
+    photo = FileField()
     submit = SubmitField('Update')
 
 
 class CommentForm(FlaskForm):
-    body = StringField('Body', validators=[DataRequired()])
-    submit = SubmitField('Post')
+    username = StringField('Username',
+                           validators=[DataRequired()])
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+    message = StringField('Comment', validators=[DataRequired()])
+    submit = SubmitField('Post comment')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if not user:
+            raise ValidationError('Username does not exist.')
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if not user:
+            raise ValidationError('Email does not exist.')
