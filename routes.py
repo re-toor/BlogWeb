@@ -15,7 +15,7 @@ def home():
 
 
 @app.route("/sign-up", methods=['GET', 'POST'])
-def register():
+def sign_up():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = SignUpForm()
@@ -95,13 +95,14 @@ def change_password():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, image=form.image.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created!', 'success')
-        return redirect(url_for('home'))
+        if form.image.data:
+            post = Post(title=form.title.data, content=form.content.data, image=form.image.data, author=current_user)
+            db.session.add(post)
+            db.session.commit()
+            flash('Your post has been created!', 'success')
+            return redirect(url_for('home'))
     image = url_for('static', filename='content_pics/')
-    return render_template('create_post.html', title='New Post',
+    return render_template('create_post.html', title='New Post', image=image,
                            form=form, legend='New Post')
 
 @app.route("/post/<int:post_id>", methods=['GET', 'POST'])
