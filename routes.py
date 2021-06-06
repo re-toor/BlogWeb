@@ -95,7 +95,7 @@ def change_password():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data,image=form.photo.data, author=current_user)
+        post = Post(title=form.title.data, content=form.content.data,image=form.image.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -103,20 +103,22 @@ def new_post():
     return render_template('create_post.html', title='New Post',
                            form=form, legend='New Post')
 
-@app.route("/post/<int:post_id>", methods=['GET', 'POST',])
+@app.route("/post/<int:post_id>", methods=['GET', 'POST'])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
+    return render_template('post.html', title=post.title, post=post)
+
+@app.route("/post/comment/<int:post_id>", methods=['GET', 'POST',])
+def comment_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    comment = Comment.query.filter_by(post_id=post.id).all()
     form = CommentForm()
     if form.validate_on_submit():
         comment = Comment(name=form.username.data, email=form.email.data, message=form.message.data, article=post.id)
         db.session.add(comment)
         db.session.commit()
         flash('Successfully!', 'success')
-        return redirect(url_for('post', post_id=post.id))
-    elif request.method == 'GET':
-        form.username.data = post.username
-        form.email.data = post.email
-        form.message.data = post.message
+        return redirect(request.url)
     return render_template('post.html', title=post.title, form=form, post=post)
 
 @app.route("/post/<int:post_id>/update", methods=['GET', 'POST'])

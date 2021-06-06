@@ -77,7 +77,7 @@ class ChangePasswordForm(FlaskForm):
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     content = TextAreaField('Content', validators=[DataRequired()])
-    photo = FileField()
+    image = FileField('Choose A Picture', validators=[FileAllowed(['jpg', 'png', 'gif', 'jpeg'])])
     submit = SubmitField('Update')
 
 
