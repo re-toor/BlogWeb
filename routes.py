@@ -95,11 +95,12 @@ def change_password():
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data,image=form.image.data, author=current_user)
+        post = Post(title=form.title.data, content=form.content.data, image=form.image.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
         return redirect(url_for('home'))
+    image = url_for('static', filename='content_pics/')
     return render_template('create_post.html', title='New Post',
                            form=form, legend='New Post')
 

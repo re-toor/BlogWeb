@@ -13,7 +13,7 @@
           </div>
         {% endif %}
       </div>
-      <img class="rounded" src="{{ url_for('static', filename='content_pics/') }}">
+      <img class="rounded" src="{{ url_for('static', filename='content_pics/') + image}}">
       <h2 class="article-title">{{ post.title }}</h2>
       <p class="article-content">{{ post.content }}</p>
       <div class="comment-form">
